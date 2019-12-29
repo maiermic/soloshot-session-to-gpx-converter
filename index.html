@@ -173,9 +173,63 @@
         reader.readAsArrayBuffer(file);
       }
     </script>
-    <label>
-        Select session file you like to convert to a GPX file:
-        <input type="file" onchange="handleFiles(this.files)">
-    </label>
+    <div>
+        <label>
+            Select session file you like to convert to a GPX file:
+            <input type="file" onchange="handleFiles(this.files)">
+        </label>
+    </div>
+    <footer style="margin-top: 16px;">
+        <hr>
+        <svg xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink" width="103" height="20">
+            <style>
+                a #llink:hover {
+                    fill: url(#b);
+                    stroke: #ccc
+                }
+            </style>
+            <linearGradient id="a" x2="0" y2="100%" class="">
+                <stop offset="0" stop-color="#fcfcfc" stop-opacity="0"/>
+                <stop offset="1" stop-opacity=".1"/>
+            </linearGradient>
+            <linearGradient xmlns="http://www.w3.org/2000/svg" id="b" x2="0"
+                            y2="100%">
+                <stop offset="0" stop-color="#ccc" stop-opacity=".1"/>
+                <stop offset="1" stop-opacity=".1"/>
+            </linearGradient>
+            <g stroke="#d5d5d5">
+                <rect stroke="none" fill="#fcfcfc" x=".5" y=".5" width="102"
+                      height="19"
+                      rx="2"/>
+            </g>
+            <image x="5" y="3" width="14" height="14"
+                   xlink:href="data:image/svg+xml;base64,PHN2ZyBmaWxsPSIjMTgxNzE3IiByb2xlPSJpbWciIHZpZXdCb3g9IjAgMCAyNCAyNCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48dGl0bGU+R2l0SHViIGljb248L3RpdGxlPjxwYXRoIGQ9Ik0xMiAuMjk3Yy02LjYzIDAtMTIgNS4zNzMtMTIgMTIgMCA1LjMwMyAzLjQzOCA5LjggOC4yMDUgMTEuMzg1LjYuMTEzLjgyLS4yNTguODItLjU3NyAwLS4yODUtLjAxLTEuMDQtLjAxNS0yLjA0LTMuMzM4LjcyNC00LjA0Mi0xLjYxLTQuMDQyLTEuNjFDNC40MjIgMTguMDcgMy42MzMgMTcuNyAzLjYzMyAxNy43Yy0xLjA4Ny0uNzQ0LjA4NC0uNzI5LjA4NC0uNzI5IDEuMjA1LjA4NCAxLjgzOCAxLjIzNiAxLjgzOCAxLjIzNiAxLjA3IDEuODM1IDIuODA5IDEuMzA1IDMuNDk1Ljk5OC4xMDgtLjc3Ni40MTctMS4zMDUuNzYtMS42MDUtMi42NjUtLjMtNS40NjYtMS4zMzItNS40NjYtNS45MyAwLTEuMzEuNDY1LTIuMzggMS4yMzUtMy4yMi0uMTM1LS4zMDMtLjU0LTEuNTIzLjEwNS0zLjE3NiAwIDAgMS4wMDUtLjMyMiAzLjMgMS4yMy45Ni0uMjY3IDEuOTgtLjM5OSAzLS40MDUgMS4wMi4wMDYgMi4wNC4xMzggMyAuNDA1IDIuMjgtMS41NTIgMy4yODUtMS4yMyAzLjI4NS0xLjIzLjY0NSAxLjY1My4yNCAyLjg3My4xMiAzLjE3Ni43NjUuODQgMS4yMyAxLjkxIDEuMjMgMy4yMiAwIDQuNjEtMi44MDUgNS42MjUtNS40NzUgNS45Mi40Mi4zNi44MSAxLjA5Ni44MSAyLjIyIDAgMS42MDYtLjAxNSAyLjg5Ni0uMDE1IDMuMjg2IDAgLjMxNS4yMS42OS44MjUuNTdDMjAuNTY1IDIyLjA5MiAyNCAxNy41OTIgMjQgMTIuMjk3YzAtNi42MjctNS4zNzMtMTItMTItMTIiLz48L3N2Zz4="/>
+            <g fill="#333" text-anchor="middle"
+               font-family="Helvetica Neue,Helvetica,Arial,sans-serif"
+               font-weight="700"
+               font-size="110">
+                <text x="595" y="150" fill="#fff" transform="scale(.1)"
+                      textLength="750">Project Home
+                </text>
+                <text x="595" y="140" transform="scale(.1)" textLength="750">
+                    Project
+                    Home
+                </text>
+            </g>
+            <a target="_blank"
+               xlink:href="https://github.com/maiermic/soloshot-session-to-gpx-converter">
+                <rect id="llink" stroke="#d5d5d5" fill="url(#a)" x=".5" y=".5"
+                      width="102" height="19" rx="2"/>
+            </a>
+        </svg>
+        <a href="https://gitter.im/maiermic/soloshot-session-to-gpx-converter?utm_source=badge&amp;utm_medium=badge&amp;utm_campaign=pr-badge&amp;utm_content=badge"
+           rel="nofollow">
+            <img src="https://camo.githubusercontent.com/53b5caf9b956ab195b658f95b1c9ed2ba5efbdd0/68747470733a2f2f6261646765732e6769747465722e696d2f6d616965726d69632f736f6c6f73686f742d73657373696f6e2d746f2d6770782d636f6e7665727465722e737667"
+                 alt="Join the chat at https://gitter.im/maiermic/soloshot-session-to-gpx-converter"
+                 data-canonical-src="https://badges.gitter.im/maiermic/soloshot-session-to-gpx-converter.svg"
+                 style="max-width:100%;">
+        </a>
+    </footer>
 </body>
 </html>
