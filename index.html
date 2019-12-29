@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Convert Soloshot 3 session file to GPX</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/1.3.8/FileSaver.min.js"></script>
+</head>
+<body>
+    <script>
+      function toHex(number) {
+        return number.toString(16).padStart(2, "0");
+      }
+
+      function bufferToHex(buffer) {
+        return Array
+          .from(buffer)
+          .map(b => toHex(b))
+          .join('');
+
+      }
+
+      function assert(condition, message) {
+        if (!condition) {
+          throw message;
+        }
+      }
+
+      class ByteReader {
+        constructor(buffer) {
+          this._data = new Uint8Array(buffer);
+          this._index = 0;
+        }
+
+        read(length) {
+          const start = this._index;
+          this._index += length;
+          return this._data.subarray(start, this._index);
+        }
+
+        readInt() {
+          return parseInt(bufferToHex(this.read(4)), 16);
+        }
+
+        readByte() {
+          return this.read(1)[0];
+        }
+
+        readGpsLocation() {
+          return {
+            latitude: this.readInt() / 1_000_000,
+            longitude: this.readInt() / 1_000_000,
+            elevation: this.readInt() / 100,
+          }
+        }
+
+        isEnd() {
+          return this._index >= this._data.length
+        }
+      }
+
+      class GpxTrack {
+
+        constructor() {
+          this._reset();
+        }
+
+        _reset() {
+          this.buffer = '  <trk>\n    <trkseg>\n';
+        }
+
+        add(pos) {
+          this.buffer += [
+            `      <trkpt lat="${pos.latitude}" lon="${pos.longitude}">`,
+            `        <ele>${pos.elevation}</ele>`,
+            '      </trkpt>\n'
+          ].join('\n');
+        }
+
+        flush() {
+          const result = this.buffer + '    </trkseg>\n  </trk>\n';
+          this._reset();
+          return result;
+        }
+
+      }
+
+
+      class Gpx {
+        constructor() {
+          this.buffer = '<?xml version="1.0" encoding="UTF-8" standalone="no" ?>\n';
+          this.buffer += '<gpx version="1.1" creator="">\n';
+        }
+
+        addTrack(track) {
+          this.buffer += track.flush();
+        }
+
+        flush() {
+          return this.buffer + '</gpx>\n';
+        }
+      }
+
+      function handleFiles(files) {
+        if (files.length !== 1) {
+          alert('Select exactly one session file');
+        }
+        const file = files[0];
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          const r = new ByteReader(e.target.result);
+          const enc = new TextDecoder();
+          try {
+            assert(enc.decode(r.read(4)) === 'SOLO', 'Invalid session file. Expected file content to start with "SOLO"');
+            r.read(12);
+            const TYPE_ID_LENGTH = 3;
+            const TYPE_PREFIX = 170;
+            const gpx = new Gpx();
+            const gpxBaseTrack = new GpxTrack();
+            const gpxTagTrack = new GpxTrack();
+            let previousTagId = null;
+            while (!r.isEnd()) {
+              assert(r.read(1)[0] === TYPE_PREFIX, 'Unexpected file content. Expected type prefix, but got something else');
+              const typeId = bufferToHex(r.read(TYPE_ID_LENGTH));
+              switch (typeId) {
+                case '1d2201':
+                  r.read(43);
+                  break;
+                case 'a00201':
+                  r.read(11);
+                  break;
+                case 'a60702':
+                  r.read(16);
+                  break;
+                case 'a50c02':
+                  r.read(21);
+                  break;
+                case 'a33c02':
+                  r.read(69);
+                  break;
+                case 'a41702':
+                  r.read(32);
+                  break;
+                case '082301':
+                  // const data = r.read(44);
+                  // console.log('location', bufferToHex(data));
+                  // console.log('tag ID', toHex(data[9]));
+                  r.read(9);
+                  const tagId = r.readByte();
+                  const basePosition = r.readGpsLocation();
+                  const tagPosition = r.readGpsLocation();
+                  r.read(10);
+                  gpxBaseTrack.add(basePosition);
+                  if (previousTagId !== null && previousTagId !== tagId) {
+                    gpx.addTrack(gpxTagTrack)
+                  }
+                  gpxTagTrack.add(tagPosition);
+                  previousTagId = tagId;
+                  break;
+                default:
+                  throw `Unexpected file content. Unknown type ID: ${typeId}`;
+              }
+            }
+            gpx.addTrack(gpxTagTrack);
+            gpx.addTrack(gpxBaseTrack);
+            const blob = new Blob([gpx.flush()], {
+              type: 'application/gpx+xml',
+            });
+            saveAs(blob, `${file.name}.gpx`);
+          } catch (e) {
+            alert(e);
+          }
+        };
+        reader.readAsArrayBuffer(file);
+      }
+    </script>
+    <label>
+        Select session file you like to convert to a GPX file:
+        <input type="file" onchange="handleFiles(this.files)">
+    </label>
+</body>
+</html>
