@@ -40,7 +40,7 @@ The session file is a binary file. The first 4 bytes represent the ASCII encoded
 | 0x082301 |          44 bytes |
 | 0xA33C02 |          69 bytes |
 
-The content of the packages `0xA00201` and `0xA60702` is unknown yet. The content of the other packages is partly figured out. The following tables show the structure of them.
+The content of the packages `0xA00201` and `0xA60702` is unknown yet. The content of the other packages is partly figured out. The following tables show the structure of them. Byte order of numbers is big endian. Strings are ASCII encoded and zero terminated.
 
 <table>
     <tr>
@@ -55,7 +55,7 @@ The content of the packages `0xA00201` and `0xA60702` is unknown yet. The conten
     <tr>
         <th>Content</th>
         <td>unknown</td>
-        <td>video resolution and FPS (zero right padded ASCII string)</td>
+        <td>video resolution and FPS (zero right padded string)</td>
     </tr>
 </table>
 
@@ -75,9 +75,9 @@ The content of the packages `0xA00201` and `0xA60702` is unknown yet. The conten
     <tr>
         <th>Content</th>
         <td>unknown</td>
-        <td>base firmware version (zero terminated string)</td>
-        <td>unknown version number (zero terminated string)</td>
-        <td>camera firmware version (zero terminated string)</td>
+        <td>base firmware version (string)</td>
+        <td>unknown version number (string)</td>
+        <td>camera firmware version (string)</td>
     </tr>
 </table>
 
@@ -94,7 +94,7 @@ The content of the packages `0xA00201` and `0xA60702` is unknown yet. The conten
     <tr>
         <th>Content</th>
         <td>unknown</td>
-        <td>zero terminated ASCII string (comma separated: serial number, time stamp, tag number)</td>
+        <td>comma separated string: serial number, time stamp, tag number</td>
     </tr>
 </table>
 
@@ -137,7 +137,7 @@ The content of the packages `0xA00201` and `0xA60702` is unknown yet. The conten
         <th>Content</th>
         <td>unknown</td>
         <td>username (zero right padded string)</td>
-        <td>tag firmware version (zero terminated string)</td>
-        <td>unknown version number (zero terminated string)</td>
+        <td>tag firmware version (string)</td>
+        <td>unknown version number (string)</td>
     </tr>
 </table>
