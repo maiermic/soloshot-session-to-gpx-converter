@@ -115,11 +115,31 @@ The content of the packages `0xA00201` and `0xA60702` is unknown yet. The conten
         <th>Content</th>
         <td>unknown</td>
         <td>tag number</td>
-        <td>GPS position of base</td>
-        <td>GPS position of tag</td>
+        <td>GPS position of base (see table below)</td>
+        <td>GPS position of tag (see table below)</td>
         <td>unknown</td>
     </tr>
 </table>
+
+<table>
+    <tr>
+        <th colspan="4">GPS position</th>
+    </tr>
+    <tr>
+        <th>Length</th>
+        <td>4 bytes</td>
+        <td>4 bytes</td>
+        <td>4 bytes</td>
+    </tr>
+    <tr>
+        <th>Content</th>
+        <td>latitude (integer)</td>
+        <td>longitude (integer)</td>
+        <td>height in centimeters (integer)</td>
+    </tr>
+</table>
+
+Latitude and longitude values divided by `1,000,000` result in decimal degree values.
 
 <table>
     <tr>
