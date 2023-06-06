@@ -114,7 +114,9 @@
           try {
             assert(enc.decode(r.read(4)) === 'SOLO', 'Invalid session file. Expected file content to start with "SOLO"');
             r.read(12);
-            const TYPE_ID_LENGTH = 3;
+            const TYPE_ID_LENGTH = 1;
+            const DATA_LENGTH = 1;
+            const HEADER_LENGTH = 10;
             const TYPE_PREFIX = 170;
             const gpx = new Gpx();
             const gpxBaseTrack = new GpxTrack();
@@ -123,33 +125,19 @@
             while (!r.isEnd()) {
               assert(r.read(1)[0] === TYPE_PREFIX, 'Unexpected file content. Expected type prefix, but got something else');
               const typeId = bufferToHex(r.read(TYPE_ID_LENGTH));
+              const dataLength = parseInt(bufferToHex(r.read(DATA_LENGTH)), 16);
+              const header = bufferToHex(r.read(HEADER_LENGTH));
+              console.debug(`typeId: ${typeId}, dataLength: ${dataLength}`)
               switch (typeId) {
-                case '1d2201':
-                  r.read(43);
+                case '1d':
+                case 'a0':
+                case 'a6':
+                case 'a5':
+                case 'a3':
+                case 'a4':
+                  r.read(dataLength);
                   break;
-                case '1d2301':
-                  r.read(44);
-                  break;
-                case 'a00201':
-                  r.read(11);
-                  break;
-                case 'a60702':
-                  r.read(16);
-                  break;
-                case 'a50c02':
-                  r.read(21);
-                  break;
-                case 'a33c02':
-                  r.read(69);
-                  break;
-                case 'a41702':
-                  r.read(32);
-                  break;
-                case '082301':
-                  // const data = r.read(44);
-                  // console.log('location', bufferToHex(data));
-                  // console.log('tag ID', toHex(data[9]));
-                  r.read(9);
+                case '08':
                   const tagId = r.readByte();
                   const basePosition = r.readGpsLocation();
                   const tagPosition = r.readGpsLocation();
