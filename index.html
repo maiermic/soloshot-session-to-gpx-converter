@@ -13,6 +13,19 @@
         return number.toString(16).padStart(2, "0");
       }
 
+      // https://stackoverflow.com/a/49404499/1065654
+      function hexToSignedInt(hex) {
+        if (hex.length % 2 !== 0) {
+          hex = "0" + hex;
+        }
+        let num = parseInt(hex, 16);
+        const maxVal = Math.pow(2, hex.length / 2 * 8);
+        if (num > maxVal / 2 - 1) {
+          num = num - maxVal
+        }
+        return num;
+      }
+
       function bufferToHex(buffer) {
         return Array
           .from(buffer)
@@ -40,7 +53,7 @@
         }
 
         readInt() {
-          return parseInt(bufferToHex(this.read(4)), 16);
+          return hexToSignedInt(bufferToHex(this.read(4)));
         }
 
         readByte() {
