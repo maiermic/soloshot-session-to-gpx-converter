@@ -6,6 +6,8 @@ Extract the GPS tracks of Soloshot 3 base and tags of a session file as GPX file
 [Try it out](https://maiermic.github.io/soloshot-session-to-gpx-converter/index.html).
 
 ## Session File Format
+_The following information is also available [here](session.ksy) as a [Kaitai Struct](https://kaitai.io/) file._
+
 The session file is a binary file. The first 4 bytes represent the ASCII encoded string `SOLO`. They are followed by 12 bytes of as yet unknown information (probably contains file version number). They are followed by packages that start with a byte `0xAA` (package separator), followed by the package type (1 byte), package data length (1 byte), package header (10 bytes) and the package data.
 
 
