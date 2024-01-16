@@ -92,8 +92,12 @@ types:
         value: elev / 100
   tag_info:
     seq:
-      - id: unk1
-        size: 3
+      - id: unk
+        size: 1
+      - id: tag_connection_id
+        type: u1
+      - id: tag_registration_id
+        type: u1
       - id: username
         type: str
         encoding: ASCII
