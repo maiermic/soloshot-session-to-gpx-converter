@@ -1,7 +1,7 @@
 meta:
   id: session
   file-extension: SESSION
-  endian: le
+  endian: be
 seq:
   - id: header
     type: file_hdr
@@ -67,8 +67,6 @@ types:
         encoding: ASCII
   locations:
     seq:
-      - id: unk1
-        size: 9
       - id: tagnum
         type: u1
       - id: base_gps
@@ -80,11 +78,11 @@ types:
   latlon:
     seq:
       - id: lat
-        type: u4
+        type: s4
       - id: lon
-        type: u4
+        type: s4
       - id: elev
-        type: u4
+        type: s4
   un_etc:
     seq:
       - id: unk1
