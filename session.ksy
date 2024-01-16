@@ -39,7 +39,7 @@ types:
             0xA5: vid_qual
             0x1D: ser_num_etc
             0x08: locations
-            0xA3: un_etc
+            0xA3: tag_info
             _: pkg_unk
   pkg_unk:
     seq:
@@ -83,7 +83,14 @@ types:
         type: s4
       - id: elev
         type: s4
-  un_etc:
+    instances:
+      lat_deg:
+        value: lat / 1000000.0
+      lon_deg:
+        value: lon / 1000000.0
+      elev_m:
+        value: elev / 100
+  tag_info:
     seq:
       - id: unk1
         size: 3
