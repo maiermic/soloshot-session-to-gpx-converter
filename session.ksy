@@ -18,7 +18,9 @@ types:
   pkg_hdr:
     seq:
       - id: unk0
-        size: 10
+        size: 2
+      - id: timestamp_ms
+        type: u8
   package:
     seq:
       - id: separator
