@@ -6,7 +6,7 @@ Extract the GPS tracks of Soloshot 3 base and tags of a session file as GPX file
 [Try it out](https://maiermic.github.io/soloshot-session-to-gpx-converter/index.html).
 
 ## Session File Format
-The session file is a binary file. The first 4 bytes represent the ASCII encoded string `SOLO`. They are followed by 12 bytes of as yet unknown information (probably contains file version number). They are followed by packages that start with a byte `0xAA` (package separator), followed by the package type (1 byte), package data length (1 byte), package header (10 bytes) and the package data.
+The session file is a binary file. The first 4 bytes represent the ASCII encoded string `SOLO`. They are followed by 12 bytes of as yet unknown information (probably contains file version number). They are followed by packages that start with a byte `AA` (package separator), followed by the package type (1 byte), package data length (1 byte), package header (10 bytes) and the package data.
 
 
 <table>
@@ -43,31 +43,29 @@ The session file is a binary file. The first 4 bytes represent the ASCII encoded
 
 ### Packages
 
-| Type | Total Data Length |
-| ---- | ----------------: |
-| 0xA0 |          11 bytes |
-| 0xA6 |          16 bytes |
-| 0xA5 |          21 bytes |
-| 0xA4 |          32 bytes |
-| 0x1D |          43 bytes |
-| 0x08 |          44 bytes |
-| 0xA3 |          69 bytes |
+| Type |    Data |
+| ---- |--------:|
+| A0 | unknown |
+| A6 | unknown        |
+| A5 |         |
+| A4 |         |
+| 1D |         |
+| 08 |         |
+| A3 |         |
 
-The content of the package header is unknown yet, as is the content of the package data of package type `0xA0` and `0xA6`. The content of the other packages is partly figured out. The following tables show the structure of them. Byte order of numbers is big endian. Strings are ASCII encoded and zero terminated.
+The content of the package header is unknown yet, as is the content of the package data of package type `A0` and `A6`. The content of the other packages is partly figured out. The following tables show the structure of them. Byte order of numbers is big endian. Strings are ASCII encoded and zero terminated.
 
 <table>
     <tr>
         <th>Type</th>
-        <td colspan="2">0xA50C02</td>
+        <td colspan="2">A5</td>
     </tr>
     <tr>
         <th>Length</th>
-        <td>10 bytes</td>
         <td>12 bytes</td>
     </tr>
     <tr>
         <th>Content</th>
-        <td>unknown</td>
         <td>contains video resolution and FPS (zero right padded string)</td>
     </tr>
 </table>
@@ -76,18 +74,16 @@ The content of the package header is unknown yet, as is the content of the packa
 <table>
     <tr>
         <th>Type</th>
-        <td colspan="4">0xA41702</td>
+        <td colspan="4">A4</td>
     </tr>
     <tr>
         <th>Length</th>
-        <td>9 bytes</td>
-        <td>7 bytes</td>
+        <td>8 bytes</td>
         <td>8 bytes</td>
         <td>8 bytes</td>
     </tr>
     <tr>
         <th>Content</th>
-        <td>unknown</td>
         <td>base firmware version (string)</td>
         <td>unknown version number (string)</td>
         <td>camera firmware version (string)</td>
@@ -97,16 +93,14 @@ The content of the package header is unknown yet, as is the content of the packa
 <table>
     <tr>
         <th>Type</th>
-        <td colspan="2">0x1D2201</td>
+        <td colspan="2">1D</td>
     </tr>
     <tr>
         <th>Length</th>
-        <td>9 bytes</td>
         <td>34 bytes</td>
     </tr>
     <tr>
         <th>Content</th>
-        <td>unknown</td>
         <td>comma separated string: serial number, time stamp, tag number</td>
     </tr>
 </table>
@@ -114,7 +108,7 @@ The content of the package header is unknown yet, as is the content of the packa
 <table>
     <tr>
         <th>Type</th>
-        <td colspan="5">0x082301</td>
+        <td colspan="5">08</td>
     </tr>
     <tr>
         <th>Length</th>
@@ -127,7 +121,7 @@ The content of the package header is unknown yet, as is the content of the packa
     <tr>
         <th>Content</th>
         <td>unknown</td>
-        <td>tag number</td>
+        <td>tag number (unsigned integer)</td>
         <td>GPS position of base (see table below)</td>
         <td>GPS position of tag (see table below)</td>
         <td>unknown</td>
@@ -146,9 +140,9 @@ The content of the package header is unknown yet, as is the content of the packa
     </tr>
     <tr>
         <th>Content</th>
-        <td>latitude (integer)</td>
-        <td>longitude (integer)</td>
-        <td>height in centimeters (integer)</td>
+        <td>latitude (signed integer)</td>
+        <td>longitude (signed integer)</td>
+        <td>height in centimeters (signed integer)</td>
     </tr>
 </table>
 
@@ -157,7 +151,7 @@ Latitude and longitude values divided by `1,000,000` result in decimal degree va
 <table>
     <tr>
         <th>Type</th>
-        <td colspan="4">0xA33C02</td>
+        <td colspan="4">A3</td>
     </tr>
     <tr>
         <th>Length</th>
