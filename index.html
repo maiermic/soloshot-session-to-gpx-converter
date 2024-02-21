@@ -26,12 +26,39 @@
         return num;
       }
 
+      function hexToInt(hex) {
+        return parseInt(hex, 16);
+      }
+
+      function hexToDate(hex) {
+        return new Date(hexToInt(hex))
+      }
+
       function bufferToHex(buffer) {
         return Array
           .from(buffer)
           .map(b => toHex(b))
           .join('');
+      }
 
+      function hex_to_ascii(hex)
+      {
+        let str = '';
+        for (let n = 0; n < hex.length; n += 2) {
+          str += String.fromCharCode(parseInt(hex.substr(n, 2), 16));
+        }
+        return str;
+      }
+
+      function chunkSubstr(str, size) {
+        const numChunks = Math.ceil(str.length / size)
+        const chunks = new Array(numChunks)
+
+        for (let i = 0, o = 0; i < numChunks; ++i, o += size) {
+          chunks[i] = str.substr(o, size)
+        }
+
+        return chunks
       }
 
       function assert(condition, message) {
@@ -56,6 +83,10 @@
           return hexToSignedInt(bufferToHex(this.read(4)));
         }
 
+        readUInt() {
+          return parseInt(bufferToHex(this.read(4)), 16);
+        }
+
         readByte() {
           return this.read(1)[0];
         }
@@ -75,18 +106,37 @@
 
       class GpxTrack {
 
-        constructor() {
-          this._reset();
+        constructor(name) {
+          this._reset(name);
         }
 
-        _reset() {
-          this.buffer = '  <trk>\n    <trkseg>\n';
+        _reset(name) {
+          this.buffer = '  <trk>\n';
+          if (name) {
+            this.buffer += `    <name>${name}</name>\n`;
+          }
+          this.buffer += '    <trkseg>\n';
+        }
+
+        _formatTimeSinceStart(milliseconds) {
+          let seconds = Math.floor(milliseconds / 1000);
+          let minutes = Math.floor(seconds / 60);
+          let hours = Math.floor(minutes / 60);
+          seconds = seconds % 60;
+          minutes = minutes % 60;
+          return [hours, minutes, seconds, milliseconds % 1000]
+            .map(t => t.toString().padStart(2, '0'))
+            .join(':')
         }
 
         add(pos) {
+          const comment = `Time (hh:mm:ss:ms): ${this._formatTimeSinceStart(pos.timeSinceStart)}`
+          const time = pos.time
           this.buffer += [
             `      <trkpt lat="${pos.latitude}" lon="${pos.longitude}">`,
             `        <ele>${pos.elevation}</ele>`,
+            `        <time>${time}</time>`,
+            `        <cmt>${comment}</cmt>`,
             '      </trkpt>\n'
           ].join('\n');
         }
@@ -121,26 +171,39 @@
         }
         const file = files[0];
         const reader = new FileReader();
+        const log = []
         reader.onload = function (e) {
           const r = new ByteReader(e.target.result);
           const enc = new TextDecoder();
           try {
             assert(enc.decode(r.read(4)) === 'SOLO', 'Invalid session file. Expected file content to start with "SOLO"');
-            r.read(12);
+            const fileHeader = bufferToHex(r.read(12));
+            const sessionStartTime = hexToInt(fileHeader.substring(12));
+            log.push([
+              'SOLO',
+              null,
+              fileHeader,
+              new Date(sessionStartTime).toISOString()]);
             const TYPE_ID_LENGTH = 1;
             const DATA_LENGTH = 1;
             const HEADER_LENGTH = 10;
             const TYPE_PREFIX = 170;
             const gpx = new Gpx();
-            const gpxBaseTrack = new GpxTrack();
+            const gpxBaseTrack = new GpxTrack('base');
             const gpxTagTrack = new GpxTrack();
             let previousTagId = null;
+            let gpsLogCount = 0
+            const maxGpsLogCount = 3
             while (!r.isEnd()) {
               assert(r.read(1)[0] === TYPE_PREFIX, 'Unexpected file content. Expected type prefix, but got something else');
               const typeId = bufferToHex(r.read(TYPE_ID_LENGTH));
               const dataLength = parseInt(bufferToHex(r.read(DATA_LENGTH)), 16);
               const header = bufferToHex(r.read(HEADER_LENGTH));
-              console.debug(`typeId: ${typeId}, dataLength: ${dataLength}`)
+              const time =
+                ['a3', 'a4', 'a5', 'a6'].includes(typeId)
+                    ? hexToDate(header.substring(8)).toISOString()
+                    : new Date(sessionStartTime + hexToInt(header.substring(8))).toISOString();
+              // console.debug(`typeId: ${typeId}, dataLength: ${dataLength}`)
               switch (typeId) {
                 case '1d':
                 case 'a0':
@@ -148,19 +211,33 @@
                 case 'a5':
                 case 'a3':
                 case 'a4':
-                  r.read(dataLength);
+                  // r.read(dataLength);
+                  let hex_data = bufferToHex(r.read(dataLength));
+                  log.push([typeId, dataLength, header, time, hex_data, hex_to_ascii(hex_data)]);
                   break;
                 case '08':
+                  // console.debug(this._data.subarray(this._index, this._index + dataLength));
                   const tagId = r.readByte();
                   const basePosition = r.readGpsLocation();
                   const tagPosition = r.readGpsLocation();
-                  r.read(10);
+                  r.read(6);
+                  // console.info(bufferToHex(r.read(6)));
+                  // this is an unconfirmed assumption
+                  const timeSinceStart = r.readUInt();
+                  basePosition.timeSinceStart = timeSinceStart;
+                  tagPosition.timeSinceStart = timeSinceStart;
+                  basePosition.time = time;
+                  tagPosition.time = time;
                   gpxBaseTrack.add(basePosition);
                   if (previousTagId !== null && previousTagId !== tagId) {
                     gpx.addTrack(gpxTagTrack)
                   }
                   gpxTagTrack.add(tagPosition);
                   previousTagId = tagId;
+                  if (gpsLogCount < maxGpsLogCount) {
+                    log.push([typeId, dataLength, header, time]);
+                    gpsLogCount++;
+                  }
                   break;
                 default:
                   throw `Unexpected file content. Unknown type ID: ${typeId}`;
@@ -172,6 +249,7 @@
               type: 'application/gpx+xml',
             });
             saveAs(blob, `${file.name}.gpx`);
+            console.table(log);
           } catch (e) {
             alert(e);
           }
