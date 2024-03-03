@@ -13,8 +13,10 @@ types:
     seq:
       - id: magic
         contents: 'SOLO'
-      - id: extra
-        size: 12
+      - id: unk
+        size: 4
+      - id: timestamp_ms
+        type: u8
   pkg_hdr:
     seq:
       - id: unk0
